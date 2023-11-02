@@ -2,6 +2,7 @@
   "name": "marlowe-workshop-dapp",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,6 +12,7 @@
   "dependencies": {
     "@marlowe.io/language-core-v1": "^0.2.0-alpha-18",
     "@marlowe.io/runtime-lifecycle": "^0.2.0-alpha-18",
+    "@marlowe.io/wallet": "^0.2.0-alpha-19",
     "next": "14.0.1",
     "react": "^18",
     "react-dom": "^18"
