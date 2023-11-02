@@ -1,10 +1,6 @@
-import { use, useEffect, useState } from "react";
+import { use } from "react";
 
 export default function Home() {
-    const [wallet, setWallet] = useState(null);
-
-    useEffect(() => {}, []);
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24 max-w-5xl w-full font-mono lg:flex">
             <h1 className=" text-5xl">Marlowe workshop -</h1>
