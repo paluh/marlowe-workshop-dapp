@@ -1,4 +1,6 @@
+"use client";
 import { use } from "react";
+import AskForCoffee from "./askForCoffee";
 
 export default function Home() {
     return (
@@ -8,13 +10,7 @@ export default function Home() {
                 Create the frontend of for the &quot;buy me a coffee&quot;
                 request{" "}
             </p>
-            <form className="flex flex-col">
-                <label>
-                    Name:
-                    <input type="text" name="name" />
-                </label>
-                <input type="submit" value="Submit" />
-            </form>
+            <AskForCoffee />
         </main>
     );
 }
