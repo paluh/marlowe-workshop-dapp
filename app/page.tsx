@@ -1,14 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import AskForCoffee from "./AskForCoffee";
-// import { CreateRuntimeLifecycle } from "./CreateRuntimeLifecycle";
-// import { WalletAPI } from "@marlowe.io/wallet";
-// import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
+import { mkRestClient } from "@marlowe.io/runtime-rest-client";
+import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
+import { CoffeesToFund } from "./CoffeesToFund";
 
 const runtimeServerURL = 'https://marlowe-runtime-preprod-web.demo.scdev.aws.iohkdev.io';
+const restAPI = mkRestClient(runtimeServerURL);
 
 export default function Home() {
-  const [runtimeLifecycle, setRuntimeLifecycle] = useState<null | any | string>(null); // RuntimeLifecycle>(null);
+  const [runtimeLifecycle, setRuntimeLifecycle] = useState<null | RuntimeLifecycle | string>(null)
 
   useEffect(() => {
     async function run() {
@@ -28,22 +29,21 @@ export default function Home() {
     }
   }, []);
 
-
   if(runtimeLifecycle === null) {
     return "Connecting to wallet...";
   } else if(typeof runtimeLifecycle === "string") {
-    return "Error: " + runtimeLifecycle;
+      "Error: " + runtimeLifecycle;
   } else {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24 max-w-5xl w-full font-mono lg:flex">
-            <h1 className=" text-5xl">Marlowe workshop</h1>
+        <main className="container">
+            <h1 className="">Marlowe workshop</h1>
             <p>
                 Create the frontend of for the &quot;buy me a coffee&quot;
                 request{" "}
             </p>
-            <AskForCoffee runtimeLifecycle={runtimeLifecycle} />
+            <AskForCoffee runtimeLifecycle={runtimeLifecycle} restAPI={restAPI} />
+            <CoffeesToFund runtimeLifecycle={runtimeLifecycle} restAPI={restAPI} />
         </main>
     );
-    /* <CoffeesToFund runtimeLifecycle={runtimeLifecycle} /> */
   }
 }

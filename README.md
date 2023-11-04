@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## marlowe-worshop-dapp
 
-## Getting Started
+### The Exercise
 
-First, run the development server:
+Slides can be found here:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+We want to implement a simple application which could perform "Buy Me a Coffee" exercise flow.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Hacking Flow
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Static contract design
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+* Please start in blockly: [play.marlowe.iohk.io](https://play.marlowe.iohk.io)
 
-## Learn More
+* Please design the contract.
 
-To learn more about Next.js, take a look at the following resources:
+### Dynamic contract buildup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* When contract is finished "Send to Simulator" (top-right corner) button should be active.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+* Then click "Download JSON" button.
 
-## Deploy on Vercel
+* We will be using marlowe-ts-sdk which provides types for language construct encoding: https://input-output-hk.github.io/marlowe-ts-sdk/modules/_marlowe_io_language_core_v1.index.html
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Now we can jump into the [./app/Contract.ts](./app/Contract.ts) and try to use the JSON which you just downloaded.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+* Let's try to make the contract "dynamic".
+
+### Basic wallet interaction
+
+* For wallet interaction we want to use [language package from TS-SDK](https://input-output-hk.github.io/marlowe-ts-sdk/interfaces/_marlowe_io_wallet.api.WalletAPI.html)
+
+* It is thin wrapper around: https://github.com/cardano-foundation/CIPs/tree/master/CIP-0030
+
+* Please jump into [./app/AskForCoffee.tsx] and search for `WALLET INTERACTION` string.
+
+* Try to grab the address there.
+
+
+### Basic Runtime interaction
+
+* We will be using Marlowe Runtime REST API: https://docs.marlowe.iohk.io/docs/developer-tools/runtime/marlowe-runtime
+
+* The API docs can be found here: https://docs.marlowe.iohk.io/api/get-contracts.
+
+* Please jump into [./app/AskForCoffee.tsx] and search for `CREATE CONTRACT` string.
+
+* Try to dynamically create the contract (you have a helper in `Contract.ts` ;-)) and implement submission.
+
+* During testing you can try to use your own address and check if the contract is on the chain in our simple Runner dapp: https://runner-preprod.scdev.aws.iohkdev.io/
+
+
+###
