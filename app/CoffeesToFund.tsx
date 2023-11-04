@@ -72,23 +72,23 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
         tags: [ DAPP_TAG ],
         partyAddresses: [...allAddresses]
       };
-      // TODO: we should provide pagination here (API is paginated)
-      const contractHeaders = await restAPI.getContracts(contractsRequest);
+      // FETCH CONTRACTS: Please fetch the contracts.
+      // const contractHeaders = ..
       // https://input-output-hk.github.io/marlowe-ts-sdk/interfaces/_marlowe_io_runtime_lifecycle.api.ContractsAPI.html#getApplicableInputs
-      const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
-        const now = Date.now();
-        const tenMinutesInMilliseconds = 10 * 60 * 1000;
-        const inTenMinutes = now + tenMinutesInMilliseconds;
-        const env = { timeInterval: { from: now, to: inTenMinutes } };
-        const { applicable_inputs } = await runtimeLifecycle.contracts.getApplicableInputs(contractHeader.contractId, env);
-        if(applicable_inputs.deposits.length > 0) {
-          const depositInfo = applicable_inputs.deposits[0];
-          return { contractHeader, deposit: Deposit.toInput(depositInfo)}
-        } else {
-          return { contractHeader, deposit: null, deposited: true}
-        }
-      }));
-      setContractHeaders(contractInfos);
+      // const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
+      //   const now = Date.now();
+      //   const tenMinutesInMilliseconds = 10 * 60 * 1000;
+      //   const inTenMinutes = now + tenMinutesInMilliseconds;
+      //   const env = { timeInterval: { from: now, to: inTenMinutes } };
+      //   const { applicable_inputs } = await runtimeLifecycle.contracts.getApplicableInputs(contractHeader.contractId, env);
+      //   if(applicable_inputs.deposits.length > 0) {
+      //     const depositInfo = applicable_inputs.deposits[0];
+      //     return { contractHeader, deposit: Deposit.toInput(depositInfo)}
+      //   } else {
+      //     return { contractHeader, deposit: null, deposited: true}
+      //   }
+      // }));
+      // setContractHeaders(contractInfos);
       await delay(POLLING_INTERVAL);
       if (shouldUpdateRef.current) { updateContracts() };
     };
