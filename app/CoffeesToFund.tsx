@@ -3,7 +3,9 @@ import { DAPP_TAG } from "./Contract";
 import { useEffect, useState } from "react";
 import { ContractHeader, GetContractsRequest } from "@marlowe.io/runtime-rest-client/contract/index";
 import { RestAPI } from "@marlowe.io/runtime-rest-client";
-import { unContractId } from "@marlowe.io/runtime-core";
+import { ContractId, unContractId } from "@marlowe.io/runtime-core";
+import { Environment, IDeposit, Input } from "@marlowe.io/language-core-v1";
+import { Deposit } from "@marlowe.io/language-core-v1/next";
 
 type CoffeesToFundProps = {
   restAPI: RestAPI,
@@ -16,8 +18,48 @@ function delay(ms: number) {
 
 const POLLING_INTERVAL = 30000;
 
+type DepositButtonProps = {
+  runtimeLifecycle: RuntimeLifecycle,
+  contractId: ContractId,
+  deposit: IDeposit | null
+}
+
+const DepositButton:React.FC<DepositButtonProps> = ({ runtimeLifecycle, contractId, deposit }) => {
+  // ApplyInputsRequest: {
+  //     inputs: Input[];
+  //     invalidBefore?: ISO8601;
+  //     invalidHereafter?: ISO8601;
+  //     metadata?: Metadata;
+  //     tags?: Tags;
+  // }
+  const [submitted, setSubmitted] = useState<boolean | string>(false);
+  // We want to display button to deposit if there is no deposit
+  if(deposit) {
+    if(!submitted) {
+      const go = async function() {
+        const inputs: Input[] = [deposit]
+        const depositRequest = {
+          inputs: inputs
+        };
+        const res = await runtimeLifecycle.contracts.applyInputs(contractId, depositRequest)
+        setSubmitted(true)
+      }
+      return <button onClick={() => go()}>Deposit</button>
+    } else {
+      return <span>Deposited</span>
+    }
+  } else {
+    return <span>Already funded</span>
+  }
+}
+
+type ContractInfo = {
+  contractHeader: ContractHeader,
+  deposit: IDeposit | null
+}
+
 export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLifecycle }) => {
-  const [contractHeaders, setContractHeaders] = useState<ContractHeader[]>([]);
+  const [contractHeaders, setContractHeaders] = useState<ContractInfo[]>([]);
   useEffect(() => {
     const shouldUpdateRef = { current: true };
     const updateContracts = async () => {
@@ -32,11 +74,22 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
       };
       // TODO: we should provide pagination here (API is paginated)
       const contractHeaders = await restAPI.getContracts(contractsRequest);
-      // const contracts = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
-      //   await restAPI.getContract(contractHeader.contractId);
-      // }));
+      // https://input-output-hk.github.io/marlowe-ts-sdk/interfaces/_marlowe_io_runtime_lifecycle.api.ContractsAPI.html#getApplicableInputs
+      const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
+        const now = Date.now();
+        const tenMinutesInMilliseconds = 10 * 60 * 1000;
+        const inTenMinutes = now + tenMinutesInMilliseconds;
+        const env = { timeInterval: { from: now, to: inTenMinutes } };
+        const { applicable_inputs } = await runtimeLifecycle.contracts.getApplicableInputs(contractHeader.contractId, env);
+        if(applicable_inputs.deposits.length > 0) {
+          const depositInfo = applicable_inputs.deposits[0];
+          return { contractHeader, deposit: Deposit.toInput(depositInfo)}
+        } else {
+          return { contractHeader, deposit: null, deposited: true}
+        }
+      }));
 
-      setContractHeaders(contractHeaders.headers);
+      setContractHeaders(contractInfos);
       await delay(POLLING_INTERVAL);
       if (shouldUpdateRef.current) { updateContracts() };
     };
@@ -51,8 +104,8 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
   } else {
     return (
     <ul>
-      {contractHeaders.map((contractHeader, index) => (
-        <li key={index}>{unContractId(contractHeader.contractId)}</li>
+      {contractHeaders.map(({ contractHeader, deposit}, index) => (
+        <li key={index}>{unContractId(contractHeader.contractId)} | <DepositButton runtimeLifecycle={runtimeLifecycle} contractId={contractHeader.contractId} deposit={deposit} /></li>
       ))}
     </ul>
     );

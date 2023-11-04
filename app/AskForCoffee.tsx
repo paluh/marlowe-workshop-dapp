@@ -66,7 +66,6 @@ const AskForCoffee: React.FC<AskForCoffeeProps> = ({ restAPI, runtimeLifecycle }
       return (
         <div>
           <p>Submitted! Transaction ID: {status.txId}</p>
-          <p>ContractId:...</p>
           <button onClick={() => setStatus(null)}>Ok</button>
         </div>
       );

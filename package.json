@@ -10,11 +10,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@marlowe.io/language-core-v1": "^0.2.0-alpha-18",
-    "@marlowe.io/runtime-core": "^0.2.0-alpha-18",
-    "@marlowe.io/runtime-lifecycle": "^0.2.0-alpha-18",
-    "@marlowe.io/runtime-rest-client": "^0.2.0-alpha-18",
-    "@marlowe.io/wallet": "^0.2.0-alpha-18",
+    "@marlowe.io/language-core-v1": "^0.2.0-alpha-19",
+    "@marlowe.io/runtime-core": "^0.2.0-alpha-19",
+    "@marlowe.io/runtime-lifecycle": "^0.2.0-alpha-19",
+    "@marlowe.io/runtime-rest-client": "^0.2.0-alpha-19",
+    "@marlowe.io/wallet": "^0.2.0-alpha-19",
     "bootstrap": "^5.3.2",
     "next": "14.0.1",
     "react": "^18",

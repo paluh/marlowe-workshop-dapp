@@ -36,12 +36,10 @@ export default function Home() {
   } else {
     return (
         <main className="container">
-            <h1 className="">Marlowe workshop</h1>
-            <p>
-                Create the frontend of for the &quot;buy me a coffee&quot;
-                request{" "}
-            </p>
+            <h2 className="">Send request</h2>
             <AskForCoffee runtimeLifecycle={runtimeLifecycle} restAPI={restAPI} />
+            <hr />
+            <h2 className="">Coffees to fund</h2>
             <CoffeesToFund runtimeLifecycle={runtimeLifecycle} restAPI={restAPI} />
         </main>
     );

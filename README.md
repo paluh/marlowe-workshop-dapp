@@ -2,7 +2,7 @@
 
 ### The Exercise
 
-Slides can be found here:
+Slides can be found here: [./public/slides.pdf](./public/slides.pdf).
 
 We want to implement a simple application which could perform "Buy Me a Coffee" exercise flow.
 
@@ -26,7 +26,7 @@ We want to implement a simple application which could perform "Buy Me a Coffee" 
 
 * Let's try to make the contract "dynamic".
 
-### Basic wallet interaction
+### Fetch address from wallet
 
 * For wallet interaction we want to use [language package from TS-SDK](https://input-output-hk.github.io/marlowe-ts-sdk/interfaces/_marlowe_io_wallet.api.WalletAPI.html)
 
@@ -37,7 +37,7 @@ We want to implement a simple application which could perform "Buy Me a Coffee" 
 * Try to grab the address there.
 
 
-### Basic Runtime interaction
+### Create Marlowe contract
 
 * We will be using Marlowe Runtime REST API: https://docs.marlowe.iohk.io/docs/developer-tools/runtime/marlowe-runtime
 
@@ -50,4 +50,8 @@ We want to implement a simple application which could perform "Buy Me a Coffee" 
 * During testing you can try to use your own address and check if the contract is on the chain in our simple Runner dapp: https://runner-preprod.scdev.aws.iohkdev.io/
 
 
-###
+### List existing contracts
+
+* The API docs can be found here: https://docs.marlowe.iohk.io/api/get-contracts.
+
+
