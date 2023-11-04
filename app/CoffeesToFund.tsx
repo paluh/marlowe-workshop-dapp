@@ -88,7 +88,6 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
           return { contractHeader, deposit: null, deposited: true}
         }
       }));
-
       setContractHeaders(contractInfos);
       await delay(POLLING_INTERVAL);
       if (shouldUpdateRef.current) { updateContracts() };

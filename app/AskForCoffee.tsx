@@ -26,8 +26,7 @@ const AskForCoffee: React.FC<AskForCoffeeProps> = ({ restAPI, runtimeLifecycle }
       const coffeeBuyerAddr = { address: inputRef.current.value };
 
       // WALLET INTERACTION
-      // try to extract connected wallet (which is part of runtimeLifecycle value) address
-      const coffeeDrinkerAddr = await runtimeLifecycle.wallet.getChangeAddress();
+      const coffeeDrinkerAddr = ("" as unknown) as AddressBech32;
 
       const contract = mkContract(
         coffeeBuyerAddr,
@@ -42,8 +41,9 @@ const AskForCoffee: React.FC<AskForCoffeeProps> = ({ restAPI, runtimeLifecycle }
       //     tags?: Tags;
       // }
       var tags = { "buy-me-a-coffee": "" };
-      const [contractId, txId] = await runtimeLifecycle.contracts.createContract({ contract, tags });
-      setStatus({ contractId, txId });
+      // CREATE CONTRACT
+      // const [contractId, txId] = ...;
+      // setStatus({ contractId, txId });
     };
     if(status === null) {
       return (
