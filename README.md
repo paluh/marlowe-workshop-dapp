@@ -32,6 +32,8 @@ We want to implement a simple application which provides a single UX for both si
 
 * Now Let's download the code from this repo to your local machine and perform stanard `npm install`.
 
+* You can check the application by running: `npm run dev` and visiting `https://127.0.0.1:3000`
+
 * When contract is finished click the "Send to Simulator" - this top-right corner button should be active.
 
 * Then click "Download JSON" button.
