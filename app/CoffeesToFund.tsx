@@ -72,23 +72,27 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
         tags: [ DAPP_TAG ],
         partyAddresses: [...allAddresses]
       };
-      // FETCH CONTRACTS: Please fetch the contracts.
-      // const contractHeaders = ..
-      // https://input-output-hk.github.io/marlowe-ts-sdk/interfaces/_marlowe_io_runtime_lifecycle.api.ContractsAPI.html#getApplicableInputs
-      // const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
-      //   const now = Date.now();
-      //   const tenMinutesInMilliseconds = 10 * 60 * 1000;
-      //   const inTenMinutes = now + tenMinutesInMilliseconds;
-      //   const env = { timeInterval: { from: now, to: inTenMinutes } };
-      //   const { applicable_inputs } = await runtimeLifecycle.contracts.getApplicableInputs(contractHeader.contractId, env);
-      //   if(applicable_inputs.deposits.length > 0) {
-      //     const depositInfo = applicable_inputs.deposits[0];
-      //     return { contractHeader, deposit: Deposit.toInput(depositInfo)}
-      //   } else {
-      //     return { contractHeader, deposit: null, deposited: true}
-      //   }
-      // }));
-      // setContractHeaders(contractInfos);
+      // FETCH CONTRACTS: Please replace the below value with `await` based call to the rest client.
+      // which should return a list of contracts that are tagged with `DAPP_TAG` and are relevant to the user.
+      const contractHeaders = await (new Promise((resolve) => { headers: [] }));
+
+      const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
+        const now = Date.now();
+        const tenMinutesInMilliseconds = 10 * 60 * 1000;
+        const inTenMinutes = now + tenMinutesInMilliseconds;
+        const env = { timeInterval: { from: now, to: inTenMinutes } };
+
+        // APPLIABLE INPUTS: Please replace the below value with `await` based call to the lifecycle API.
+        const { applicable_inputs } = await (new Promise((resolve) => { applicable_inputs: { deposits: [] } }));
+
+        if(applicable_inputs.deposits.length > 0) {
+          const depositInfo = applicable_inputs.deposits[0];
+          return { contractHeader, deposit: Deposit.toInput(depositInfo)}
+        } else {
+          return { contractHeader, deposit: null, deposited: true}
+        }
+      }));
+      setContractHeaders(contractInfos);
       await delay(POLLING_INTERVAL);
       if (shouldUpdateRef.current) { updateContracts() };
     };
