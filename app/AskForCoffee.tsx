@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
 import { DAPP_TAG, mkContract } from "./Contract";
 import { Address } from "@marlowe.io/language-core-v1";
-import { AddressBech32, TxId, unAddressBech32, unContractId } from "@marlowe.io/runtime-core";
+import { AddressBech32, TxId } from "@marlowe.io/runtime-core";
 import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
-import { RestAPI } from "@marlowe.io/runtime-rest-client";
+import { FPTSRestAPI } from "@marlowe.io/runtime-rest-client";
 
 type AskForCoffeeProps = {
-  restAPI: RestAPI,
+  restAPI: FPTSRestAPI,
   runtimeLifecycle: RuntimeLifecycle
 };
 
 const addressFromBech32 = (addr: AddressBech32): Address => {
-  return { address: unAddressBech32(addr) };
+  return { address: addr };
 }
 
 const AskForCoffee: React.FC<AskForCoffeeProps> = ({ restAPI, runtimeLifecycle }) => {

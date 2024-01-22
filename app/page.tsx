@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import AskForCoffee from "./AskForCoffee";
-import { mkRestClient } from "@marlowe.io/runtime-rest-client";
+import { mkFPTSRestClient, mkRestClient } from "@marlowe.io/runtime-rest-client";
 import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
 import { CoffeesToFund } from "./CoffeesToFund";
+// `next.js` doesn't like this import:
+// import { mkRuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/browser";
 
 const runtimeServerURL = 'https://marlowe-runtime-preprod-web.demo.scdev.aws.iohkdev.io';
-const restAPI = mkRestClient(runtimeServerURL);
+const restAPI = mkFPTSRestClient(runtimeServerURL);
 
 export default function Home() {
   const [runtimeLifecycle, setRuntimeLifecycle] = useState<null | RuntimeLifecycle | string>(null)

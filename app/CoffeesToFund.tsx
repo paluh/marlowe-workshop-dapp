@@ -1,14 +1,14 @@
 import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
 import { DAPP_TAG } from "./Contract";
 import { useEffect, useState } from "react";
-import { ContractHeader, GetContractsRequest } from "@marlowe.io/runtime-rest-client/contract/index";
-import { RestAPI } from "@marlowe.io/runtime-rest-client";
-import { ContractId, unContractId } from "@marlowe.io/runtime-core";
+import * as Contract from "@marlowe.io/runtime-rest-client/contract";
+import { FPTSRestAPI } from "@marlowe.io/runtime-rest-client";
+import { ContractId } from "@marlowe.io/runtime-core";
 import { Environment, IDeposit, Input } from "@marlowe.io/language-core-v1";
-import { Deposit } from "@marlowe.io/language-core-v1/next";
+import { Deposit, Next } from "@marlowe.io/language-core-v1/next";
 
 type CoffeesToFundProps = {
-  restAPI: RestAPI,
+  restAPI: FPTSRestAPI,
   runtimeLifecycle: RuntimeLifecycle
 };
 
@@ -54,7 +54,7 @@ const DepositButton:React.FC<DepositButtonProps> = ({ runtimeLifecycle, contract
 }
 
 type ContractInfo = {
-  contractHeader: ContractHeader,
+  contractHeader: Contract.ContractHeader,
   deposit: IDeposit | null
 }
 
@@ -68,25 +68,25 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
       walletAddresses.push(changeAddress);
       const allAddresses = new Set(walletAddresses);
 
-      const contractsRequest: GetContractsRequest = {
+      const contractsRequest: Contract.GetContractsRequest = {
         tags: [ DAPP_TAG ],
         partyAddresses: [...allAddresses]
       };
       // FETCH CONTRACTS: Please replace the below value with `await` based call to the rest client.
       // which should return a list of contracts that are tagged with `DAPP_TAG` and are relevant to the user.
-      const contractHeaders = await (new Promise((resolve) => { headers: [] }));
+      const contractHeaders:{ headers: Contract.ContractHeader[] } = await (new Promise((resolve) => { headers: [] }));
 
-      const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader:ContractHeader) => {
+      const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader: Contract.ContractHeader) => {
         const now = Date.now();
         const tenMinutesInMilliseconds = 10 * 60 * 1000;
         const inTenMinutes = now + tenMinutesInMilliseconds;
         const env = { timeInterval: { from: now, to: inTenMinutes } };
 
         // APPLIABLE INPUTS: Please replace the below value with `await` based call to the lifecycle API.
-        const { applicable_inputs } = await (new Promise((resolve) => { applicable_inputs: { deposits: [] } }));
+        const response:Next = await (new Promise((resolve) => { applicable_inputs: { deposits: [] } }));
 
-        if(applicable_inputs.deposits.length > 0) {
-          const depositInfo = applicable_inputs.deposits[0];
+        if(response.applicable_inputs.deposits.length > 0) {
+          const depositInfo = response.applicable_inputs.deposits[0];
           return { contractHeader, deposit: Deposit.toInput(depositInfo)}
         } else {
           return { contractHeader, deposit: null, deposited: true}
@@ -108,7 +108,7 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
     return (
     <ul>
       {contractHeaders.map(({ contractHeader, deposit}, index) => (
-        <li key={index}>{unContractId(contractHeader.contractId)} | <DepositButton runtimeLifecycle={runtimeLifecycle} contractId={contractHeader.contractId} deposit={deposit} /></li>
+        <li key={index}>{ contractHeader.contractId } | <DepositButton runtimeLifecycle={runtimeLifecycle} contractId={contractHeader.contractId} deposit={deposit} /></li>
       ))}
     </ul>
     );
