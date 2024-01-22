@@ -3,8 +3,8 @@ import { DAPP_TAG } from "./Contract";
 import { useEffect, useState } from "react";
 import * as Contract from "@marlowe.io/runtime-rest-client/contract";
 import { FPTSRestAPI } from "@marlowe.io/runtime-rest-client";
-import { ContractId } from "@marlowe.io/runtime-core";
-import { Environment, IDeposit, Input } from "@marlowe.io/language-core-v1";
+import { AddressBech32, ContractId } from "@marlowe.io/runtime-core";
+import { Address, IDeposit, Input } from "@marlowe.io/language-core-v1";
 import { Deposit, Next } from "@marlowe.io/language-core-v1/next";
 
 type CoffeesToFundProps = {
@@ -22,6 +22,10 @@ type DepositButtonProps = {
   runtimeLifecycle: RuntimeLifecycle,
   contractId: ContractId,
   deposit: IDeposit | null
+}
+
+const addressFromBech32 = (addr: AddressBech32): Address => {
+  return { address: addr };
 }
 
 const DepositButton:React.FC<DepositButtonProps> = ({ runtimeLifecycle, contractId, deposit }) => {
@@ -56,10 +60,11 @@ const DepositButton:React.FC<DepositButtonProps> = ({ runtimeLifecycle, contract
 type ContractInfo = {
   contractHeader: Contract.ContractHeader,
   deposit: IDeposit | null
+  deposited: boolean,
 }
 
 export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLifecycle }) => {
-  const [contractHeaders, setContractHeaders] = useState<ContractInfo[]>([]);
+  const [contractInfos, setContractInfos] = useState<ContractInfo[]>([]);
   useEffect(() => {
     const shouldUpdateRef = { current: true };
     const updateContracts = async () => {
@@ -76,23 +81,23 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
       // which should return a list of contracts that are tagged with `DAPP_TAG` and are relevant to the user.
       const contractHeaders:{ headers: Contract.ContractHeader[] } = await (new Promise((resolve) => { headers: [] }));
 
-      const contractInfos = await Promise.all(contractHeaders.headers.map(async (contractHeader: Contract.ContractHeader) => {
+      const contractInfos:ContractInfo[] = await Promise.all(contractHeaders.headers.map(async (contractHeader: Contract.ContractHeader) => {
         const now = Date.now();
         const tenMinutesInMilliseconds = 10 * 60 * 1000;
-        const inTenMinutes = now + tenMinutesInMilliseconds;
-        const env = { timeInterval: { from: now, to: inTenMinutes } };
+        const inTenMinutes = BigInt(tenMinutesInMilliseconds);
+        const env = { timeInterval: { from: BigInt(now), to: inTenMinutes } };
 
         // APPLIABLE INPUTS: Please replace the below value with `await` based call to the lifecycle API.
-        const response:Next = await (new Promise((resolve) => { applicable_inputs: { deposits: [] } }));
+        const response:Next = await runtimeLifecycle.contracts.getApplicableInputs(contractHeader.contractId, env);
 
         if(response.applicable_inputs.deposits.length > 0) {
           const depositInfo = response.applicable_inputs.deposits[0];
-          return { contractHeader, deposit: Deposit.toInput(depositInfo)}
+          return { contractHeader, deposit: Deposit.toInput(depositInfo), deposited: false}
         } else {
           return { contractHeader, deposit: null, deposited: true}
         }
       }));
-      setContractHeaders(contractInfos);
+      setContractInfos(contractInfos);
       await delay(POLLING_INTERVAL);
       if (shouldUpdateRef.current) { updateContracts() };
     };
@@ -102,13 +107,23 @@ export const CoffeesToFund: React.FC<CoffeesToFundProps> = ({ restAPI, runtimeLi
     };
   }, []);
 
-  if(contractHeaders.length === 0) {
+  const depositButton = (deposit: IDeposit | null, deposited: boolean, contractHeader: Contract.ContractHeader): JSX.Element => {
+    if(deposited) {
+      return <span>Already funded</span>
+    }
+    if(deposit !== null) {
+      return <DepositButton runtimeLifecycle={runtimeLifecycle} contractId={contractHeader.contractId} deposit={deposit} />
+    }
+    return <span>Awaiting deposit from the other side</span>
+  }
+
+  if(contractInfos.length === 0) {
     return <p>No coffees to fund</p>
   } else {
     return (
     <ul>
-      {contractHeaders.map(({ contractHeader, deposit}, index) => (
-        <li key={index}>{ contractHeader.contractId } | <DepositButton runtimeLifecycle={runtimeLifecycle} contractId={contractHeader.contractId} deposit={deposit} /></li>
+      {contractInfos.map(({ contractHeader, deposit, deposited }, index) => (
+        <li key={index}>{contractHeader.contractId} | {depositButton(deposit, deposited, contractHeader)}</li>
       ))}
     </ul>
     );

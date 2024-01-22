@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
 import { DAPP_TAG, mkContract } from "./Contract";
 import { Address } from "@marlowe.io/language-core-v1";
+import * as Contract from "@marlowe.io/runtime-rest-client/contract";
 import { AddressBech32, TxId } from "@marlowe.io/runtime-core";
-import { RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
+import { CreateContractRequest, RuntimeLifecycle } from "@marlowe.io/runtime-lifecycle/api";
 import { FPTSRestAPI } from "@marlowe.io/runtime-rest-client";
 
 type AskForCoffeeProps = {
@@ -25,25 +26,20 @@ const AskForCoffee: React.FC<AskForCoffeeProps> = ({ restAPI, runtimeLifecycle }
       if(!inputRef.current) return;
       const coffeeBuyerAddr = { address: inputRef.current.value };
 
-      // WALLET INTERACTION
-      const coffeeDrinkerAddr = ("" as unknown) as AddressBech32;
+      const coffeeDrinkerAddr = await runtimeLifecycle.wallet.getChangeAddress();
 
       const contract = mkContract(
         coffeeBuyerAddr,
         addressFromBech32(coffeeDrinkerAddr)
       );
-      // CREATE CONTRACT
-      // CreateContractRequest: {
-      //     contract: Contract;
-      //     metadata?: Metadata;
-      //     minUTxODeposit?: number;
-      //     roles?: RolesConfig;
-      //     tags?: Tags;
-      // }
       var tags = { "buy-me-a-coffee": "" };
-      // CREATE CONTRACT
-      // const [contractId, txId] = ...;
-      // setStatus({ contractId, txId });
+      const contractRequest:CreateContractRequest = {
+        contract,
+        tags,
+      };
+
+      const [contractId, txId] = await runtimeLifecycle.contracts.createContract(contractRequest);
+      setStatus({ contractId, txId });
     };
     if(status === null) {
       return (
